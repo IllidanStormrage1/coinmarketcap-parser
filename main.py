@@ -21,7 +21,8 @@ def write_csv(data):
                          data["pes"],
                          data["website"]))
 
-
+        
+# получаем все ссылки на каждую монету и набиваем ими список
 def get_all_links(html):
     soup = bs4.BeautifulSoup(html, "lxml")
 
@@ -35,6 +36,7 @@ def get_all_links(html):
     return links
 
 
+# дергаем необходимые нам данные
 def get_page_data(html):
     soup = bs4.BeautifulSoup(html, "lxml")
 
@@ -81,6 +83,7 @@ def main():
 
     print("> Starting\033[5m...\033[0m")
 
+    # берем рандомный ip и useragent для избежания бана со стороны сайта
     random_proxy = random.choice(open("proxies.txt", "r").read().split("\n"))
     random_useragent = random.choice(open("useragents.txt", "r").read().split("\n"))
 
@@ -91,6 +94,7 @@ def main():
     links = get_all_links(get_html(url))
     print("> Parsing\033[5m...\033[0m")
 
+    # создаем потоки, кол-во потоков равно введенному числу
     with Pool(process) as p:
         p.map(make_all, links)
 
