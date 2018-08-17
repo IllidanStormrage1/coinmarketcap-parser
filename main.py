@@ -74,7 +74,6 @@ def get_page_data(html):
 
 def main():
     global name_csv, proxy, useragent
-    print(config.title)
 
     url = "https://coinmarketcap.com/all/views/all/"
 
