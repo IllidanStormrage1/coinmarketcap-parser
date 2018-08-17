@@ -5,4 +5,4 @@ If there is an error:
 ```
 AttributeError: 'NoneType' object has no attribute 'find_all'
 ```
-then most likely the ip address is banned, try again or update the address list.
+then most likely the ip address is banned, try again or update the address list :arrows_counterclockwise:.
