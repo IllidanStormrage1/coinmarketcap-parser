@@ -10,7 +10,7 @@ def get_html(url):
     r = requests.get(url, proxies=proxy, headers=useragent)
     return r.text
 
-
+# Запись данных в csv
 def write_csv(data):
     with open(name_csv, "a") as f:
         writer = csv.writer(f)
@@ -33,17 +33,15 @@ def get_all_links(html):
     return links
 
 
-# дергаем необходимые нам данные
+# Дергаем необходимые нам данные со страницы монеты
 def get_page_data(html):
     soup = bs4.BeautifulSoup(html, "lxml")
     try:
-        name_ = soup.find("h1", class_="details-panel-item--name").text.strip()
-        name = name_.replace("\n", " ")
+        name = soup.find("h1", class_="details-panel-item--name").text.strip().replace("\n", " ")
     except:
         name = ""
     try:
-        price_ = soup.find("span", id="quote_price").text.strip()
-        price = price_.replace("\n", " ")
+        price = soup.find("span", id="quote_price").text.strip().replace("\n", " ")
     except:
         price = ""
     try:
@@ -72,38 +70,33 @@ def main():
     global name_csv, proxy, useragent
     url = "https://coinmarketcap.com/all/views/all/"
 
-    name_csv = str(input("\nName file : ")) + ".csv"
-    process = int(input("Process : "))
+    name_csv = str(input("Name file : ")) + ".csv"
+    process = int(input("Process(CPUcores*2) : "))
 
-    print("> Starting...")
-
-    # берем рандомный ip и useragent для избежания бана со стороны сайта
+    # Берем рандомный ip и useragent для избежания бана со стороны сайта
     random_proxy = random.choice(open("proxies.txt", "r").read().split("\n"))
     random_useragent = random.choice(open("useragents.txt", "r").read().split("\n"))
-
     proxy = {"http": "http://" + random_proxy}
     useragent = {"User-Agent": random_useragent}
 
+    # Определяем время начала работы скрипта(основы)
     start = datetime.datetime.now()
+    print("> Starting...")
+    
+    # Получаем список урлов монет
     links = get_all_links(get_html(url))
     print("> Parsing...")
-
+    
     # создаем потоки, кол-во потоков равно введенному числу
     with Pool(process) as p:
         p.map(make_all, links)
 
-    print("\n=========DONE=========")
+    print("Parsing time: ", str(datetime.datetime.now() - start), "\nCoins:", len(links))
 
-    stop = datetime.datetime.now()
-    time = str(stop - start)
-
-    print("Parsing time: ", time)
-    print("Coins:", len(links))
-
-
+# Функция для потоков
 def make_all(url):
     write_csv(get_page_data(get_html(url)))
 
-
+    
 if __name__ == "__main__":
     main()
