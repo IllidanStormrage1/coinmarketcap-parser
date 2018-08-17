@@ -3,7 +3,6 @@ import requests
 import csv
 from multiprocessing import Pool
 import datetime
-import config
 import random
 
 
@@ -25,21 +24,18 @@ def write_csv(data):
 # получаем все ссылки на каждую монету и набиваем ими список
 def get_all_links(html):
     soup = bs4.BeautifulSoup(html, "lxml")
-
     tds = soup.find("table", id="currencies-all").find_all("td", class_="no-wrap currency-name")
-
     links = []
-
     for td in tds:
         a = "https://coinmarketcap.com" + str(td.find("a", class_="link-secondary").get("href"))
         links.append(a)
+        
     return links
 
 
 # дергаем необходимые нам данные
 def get_page_data(html):
     soup = bs4.BeautifulSoup(html, "lxml")
-
     try:
         name_ = soup.find("h1", class_="details-panel-item--name").text.strip()
         name = name_.replace("\n", " ")
@@ -74,13 +70,12 @@ def get_page_data(html):
 
 def main():
     global name_csv, proxy, useragent
-
     url = "https://coinmarketcap.com/all/views/all/"
 
     name_csv = str(input("\nName file : ")) + ".csv"
     process = int(input("Process : "))
 
-    print("> Starting\033[5m...\033[0m")
+    print("> Starting...")
 
     # берем рандомный ip и useragent для избежания бана со стороны сайта
     random_proxy = random.choice(open("proxies.txt", "r").read().split("\n"))
@@ -91,13 +86,13 @@ def main():
 
     start = datetime.datetime.now()
     links = get_all_links(get_html(url))
-    print("> Parsing\033[5m...\033[0m")
+    print("> Parsing...")
 
     # создаем потоки, кол-во потоков равно введенному числу
     with Pool(process) as p:
         p.map(make_all, links)
 
-    print("\n\033[92m=========DONE=========\033[0m")
+    print("\n=========DONE=========")
 
     stop = datetime.datetime.now()
     time = str(stop - start)
