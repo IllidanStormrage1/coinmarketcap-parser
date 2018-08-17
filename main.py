@@ -71,7 +71,6 @@ def main():
     url = "https://coinmarketcap.com/all/views/all/"
 
     name_csv = str(input("Name file : ")) + ".csv"
-    process = int(input("Process(CPUcores*2) : "))
 
     # Берем рандомный ip и useragent для избежания бана со стороны сайта
     random_proxy = random.choice(open("proxies.txt", "r").read().split("\n"))
@@ -87,8 +86,8 @@ def main():
     links = get_all_links(get_html(url))
     print("> Parsing...")
     
-    # создаем потоки, кол-во потоков равно введенному числу
-    with Pool(process) as p:
+    # создаем потоки, при 48-и потоках <1мин
+    with Pool(48) as p:
         p.map(make_all, links)
 
     print("Parsing time: ", str(datetime.datetime.now() - start), "\nCoins:", len(links))
